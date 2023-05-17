@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 import json
 import pprint
+import os
 
 app = Flask(__name__)
 
@@ -51,22 +52,52 @@ def order_done():
     return render_template('request_done.html')
 
 
-@app.route("/booking/<teacher_id>/<week_day>/<time>/")
+@app.route("/booking/<teacher_id>/<week_day>/<time>/", methods=['GET', 'POST'])
 def booking(teacher_id, week_day, time):
     with open('output.json', 'r') as json_file:
         json_string = json_file.read()
         teachers_dictionary = json.loads(json_string)
         teacher_data = teachers_dictionary[int(teacher_id)]
         teacher_name = teacher_data['name']
+        teacher_picture = teacher_data['picture']
         pprint.pprint(teacher_data)
     return render_template('booking.html',
                            teacher_name=teacher_name, teacher_id=teacher_id,
-                           week_day=week_day, time=time)
+                           week_day=week_day, time=time, teacher_picture=teacher_picture)
 
 
-@app.route("/booking_done/")
+@app.route("/booking_done/", methods=['GET', 'POST'])
 def booking_done():
-    return render_template('booking_done.html')
+    if request.method == 'GET':
+        return redirect('/index')
+    else:
+        clientWeekday = request.form.get("clientWeekday")
+        clientTime = request.form.get("clientTime")
+        clientTeacher = request.form.get("clientTeacher")
+        clientName = request.form.get("clientName")
+        clientPhone = request.form.get("clientPhone")
+
+        new_data = {
+            "clientWeekday": clientWeekday,
+            "clientTime": clientTime,
+            "clientTeacher": clientTeacher,
+            "clientName": clientName,
+            "clientPhone": clientPhone
+        }
+
+        try:
+            with open('booking.json', 'r') as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            data = {}
+        new_key = str(len(data) + 1)
+        data[new_key] = new_data
+        with open('booking.json', 'w') as file:
+            json.dump(data, file, indent=2)
+
+        return render_template("booking_done.html",
+                               day=clientWeekday, time=clientTime,
+                               name=clientName, phone=clientPhone)
 
 
 if __name__ == "__main__":

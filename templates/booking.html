@@ -33,20 +33,20 @@
   <main class="container mt-3">
     <div class="row mt-5">
       <div class="col-10 col-md-6 offset-1 offset-md-3 mb-3">
-        <form action="booking_done.html" class="card mb-3">
+          <form action="/booking_done/" method="POST" class="card mb-3">
           <div class="card-body text-center pt-5">
-            <img src="../static/pict 1.png" class="mb-3" width="95" alt="">
+            <img src="{{ teacher_picture }}" class="mb-3" width="95" alt="">
             <h2 class="h5 card-title mt-2 mb-2">{{ teacher_name }}</h2>
             <p class="my-1">Sign up for a trial lesson</p>
             {% set day_names = {'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'} %}
-            <p class="my-1">{{ day_names[week_day] }}, {{ time }}</p>
+            <p class="my-1">{{ day_names[day] }}, {{ time }}</p>
           </div>
           <hr />
           <div class="card-body mx-3">
               <div class="row">
-                  <input class="form-control" type="hidden" name="clientWeekday" value="mon">
-                  <input class="form-control" type="hidden" name="clientTime" value="12:00">
-                  <input class="form-control" type="hidden" name="clientTeacher" value="10">
+                  <input class="form-control" type="hidden" name="clientWeekday" value="{{ week_day }}">
+                  <input class="form-control" type="hidden" name="clientTime" value="{{ time }}">
+                  <input class="form-control" type="hidden" name="clientTeacher" value="{{ teacher_id }}">
               </div>
 
             <label class="mb-1 mt-2" for="clientName">Your name</label>
