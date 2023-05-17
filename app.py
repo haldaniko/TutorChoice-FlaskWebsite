@@ -16,7 +16,7 @@ def all_teachers():
     return render_template('all.html')
 
 
-@app.route('/goal')
+@app.route('/goals/<goal>/')
 def goal():
     return render_template('goal.html')
 
@@ -51,9 +51,17 @@ def order_done():
     return render_template('request_done.html')
 
 
-# @app.route("/booking/<teacher_id>/<week_day>/<time>/")
-# def booking(teacher_id, week_day, time):
-#     return "Здесь будет форма бронирования " + teacher_id
+@app.route("/booking/<teacher_id>/<week_day>/<time>/")
+def booking(teacher_id, week_day, time):
+    with open('output.json', 'r') as json_file:
+        json_string = json_file.read()
+        teachers_dictionary = json.loads(json_string)
+        teacher_data = teachers_dictionary[int(teacher_id)]
+        teacher_name = teacher_data['name']
+        pprint.pprint(teacher_data)
+    return render_template('booking.html',
+                           teacher_name=teacher_name, teacher_id=teacher_id,
+                           week_day=week_day, time=time)
 
 
 @app.route("/booking_done/")

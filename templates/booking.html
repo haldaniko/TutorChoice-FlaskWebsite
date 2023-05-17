@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -35,9 +36,10 @@
         <form action="booking_done.html" class="card mb-3">
           <div class="card-body text-center pt-5">
             <img src="../static/pict 1.png" class="mb-3" width="95" alt="">
-            <h2 class="h5 card-title mt-2 mb-2">Morris Simmmons</h2>
-            <p class="my-1">Запись на пробный урок</p>
-            <p class="my-1">Вторник, 12:00</p>
+            <h2 class="h5 card-title mt-2 mb-2">{{ teacher_name }}</h2>
+            <p class="my-1">Sign up for a trial lesson</p>
+            {% set day_names = {'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'} %}
+            <p class="my-1">{{ day_names[week_day] }}, {{ time }}</p>
           </div>
           <hr />
           <div class="card-body mx-3">
@@ -47,13 +49,13 @@
                   <input class="form-control" type="hidden" name="clientTeacher" value="10">
               </div>
 
-            <label class="mb-1 mt-2" for="clientName">Вас зовут</label>
+            <label class="mb-1 mt-2" for="clientName">Your name</label>
             <input class="form-control" type="text" name="clientName" id="clientName">
 
-            <label class="mb-1 mt-2" for="clientPhone">Ваш телефон</label>
+            <label class="mb-1 mt-2" for="clientPhone">Your phone</label>
             <input class="form-control" type="tel"  name="clientPhone" id="clientPhone">
 
-            <input type="submit" class="btn btn-primary btn-block mt-4" value="Записаться на пробный урок">
+            <input type="submit" class="btn btn-primary btn-block mt-4" value="Sign up for a trial lesson">
 
           </div>
         </form>
