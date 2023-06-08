@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect
 import json
+import random
 import pprint
-import os
 
 app = Flask(__name__)
 
@@ -9,17 +9,34 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/index')
 def home():
-    return render_template('index.html')
+    with open('output.json', 'r') as json_file:
+        json_string = json_file.read()
+        teachers_dictionary = json.loads(json_string)
+        teachers_dict_3 = random.sample(teachers_dictionary, 3)
+    return render_template('index.html', teachers_dict_3=teachers_dict_3)
 
 
 @app.route('/all')
 def all_teachers():
-    return render_template('all.html')
+    with open('output.json', 'r') as json_file:
+        json_string = json_file.read()
+        teachers_dictionary = json.loads(json_string)
+        random.shuffle(teachers_dictionary)
+    return render_template('all.html', teachers_dictionary=teachers_dictionary)
 
 
-@app.route('/goals/<goal>/')
-def goal():
-    return render_template('goal.html')
+@app.route('/goals/<client_goal>/')
+def goal(client_goal):
+    with open('output.json', 'r') as json_file:
+        json_string = json_file.read()
+        teachers_dictionary = json.loads(json_string)
+        teachers_goal_dict = []
+        for teacher in teachers_dictionary:
+            for goal in teacher['goals']:
+                if goal == client_goal:
+                    teachers_goal_dict.append(teacher)
+
+    return render_template('goal.html', client_goal=client_goal, teachers_goal_dict=teachers_goal_dict)
 
 
 @app.route('/profiles/<teacher_id>/')
@@ -28,8 +45,6 @@ def teachers_profiles(teacher_id):
         json_string = json_file.read()
         teachers_dictionary = json.loads(json_string)
         teacher_data = teachers_dictionary[int(teacher_id)]
-        pprint.pprint(teacher_data)
-
     busy_days = []
     for day, time in teacher_data['free'].items():
         is_busy = False
@@ -47,9 +62,36 @@ def order():
     return render_template('request.html')
 
 
-@app.route("/request_done/")
+@app.route("/request_done/", methods=['GET', 'POST'])
 def order_done():
-    return render_template('request_done.html')
+    if request.method == 'GET':
+        return redirect('/request')
+    else:
+        clientGoal = request.form.get("goal")
+        clientTime = request.form.get("time")
+        clientName = request.form.get("clientName")
+        clientPhone = request.form.get("clientPhone")
+
+        new_data = {
+            "clientGoal": clientGoal,
+            "clientTime": clientTime,
+            "clientName": clientName,
+            "clientPhone": clientPhone,
+        }
+
+        try:
+            with open('request.json', 'r') as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            data = {}
+        new_key = str(len(data) + 1)
+        data[new_key] = new_data
+        with open('request.json', 'w') as file:
+            json.dump(data, file, indent=2)
+        print(clientGoal, clientName, clientTime, clientPhone)
+        return render_template('request_done.html',
+                               goal=clientGoal, time=clientTime,
+                               name=clientName, phone=clientPhone)
 
 
 @app.route("/booking/<teacher_id>/<week_day>/<time>/", methods=['GET', 'POST'])
@@ -60,7 +102,6 @@ def booking(teacher_id, week_day, time):
         teacher_data = teachers_dictionary[int(teacher_id)]
         teacher_name = teacher_data['name']
         teacher_picture = teacher_data['picture']
-        pprint.pprint(teacher_data)
     return render_template('booking.html',
                            teacher_name=teacher_name, teacher_id=teacher_id,
                            week_day=week_day, time=time, teacher_picture=teacher_picture)
