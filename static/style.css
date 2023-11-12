@@ -1,0 +1,6 @@
+body {
+        background-image: url('/static/images/1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
